@@ -28,7 +28,7 @@ export default function App() {
       <Routes>
         <Route
           path="/signup"
-          element={user ? <Navigate to="/home" replace /> : <Signup />}
+          element={user ? <Navigate to="/home" replace /> :<Signup />}
         />
         <Route
           path="/login"

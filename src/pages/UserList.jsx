@@ -4,13 +4,24 @@ import { db } from "../utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import calculateInversionCount from "../utils/calculateInversionCount";
+import { doc, getDoc } from "firebase/firestore";
 
 const UsersList = () => {
   const { currentUser } = useAuth();
+  const [userData, setUserData] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
+    const fetchUser = async () => {
+      if (currentUser) {
+        const docRef = doc(db, "users", currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setUserData(docSnap.data());
+        }
+      }
+    };
+    fetchUser();
     const fetchUsers = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "users"));
@@ -24,11 +35,14 @@ const UsersList = () => {
         // Calculate compatibility
         const updatedUsers = usersData.map((user) => {
           const inversionCount = calculateInversionCount(
-            currentUser,
+            userData,
             user
           );
-          const compatibilityScore = 100 - inversionCount * 10; 
-          // 👆 just a sample formula, we can refine later
+          const n=userData?.orderedList?.length;
+          console.log(n);
+          
+          const compatibilityScore = ((1-(inversionCount/(n*(n-1))/2))*100).toFixed(2);
+          console.log(compatibilityScore);
           return { ...user, compatibilityScore };
         });
 

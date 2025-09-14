@@ -19,6 +19,7 @@ export default function Profile() {
                 if (docSnap.exists()) {
                     setUserData(docSnap.data());
                 }
+                
             }
         };
         fetchUser();

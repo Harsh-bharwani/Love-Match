@@ -19,7 +19,7 @@ export default function Profile() {
                 if (docSnap.exists()) {
                     setUserData(docSnap.data());
                 }
-                
+
             }
         };
         fetchUser();
@@ -34,7 +34,7 @@ export default function Profile() {
             <div className="bg-white shadow-md rounded-xl p-8 w-full max-w-md text-center">
                 <img
                     src={userData.photoURL
- || "https://media.licdn.com/dms/image/v2/D4D03AQEdBWGX3_vN5Q/profile-displayphoto-shrink_200_200/B4DZc7pjiLGUAk-/0/1749052439493?e=2147483647&v=beta&t=Xr3-qJXNXwXGBcgFZcCCntE8El1LAjzCRo-RR25feu4"}
+                        || "https://via.placeholder.com/150"}
                     alt={userData.name}
                     className="w-28 h-28 mx-auto rounded-full mb-4 object-cover border"
                 />
@@ -46,6 +46,12 @@ export default function Profile() {
                     className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
                 >
                     Discover People
+                </button>
+                <button
+                    onClick={() => navigate("/editProfile")}
+                    className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 ms-3"
+                >
+                    Edit Profile
                 </button>
             </div>
         </div>

@@ -20,15 +20,14 @@ const UsersList = () => {
 
         // Fetch logged-in user
         const docRef = doc(db, "users", currentUser.uid);
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDoc(docRef);        
         if (!docSnap.exists()) {
           console.error("No such document for current user!");
           setLoading(false);
           return;
         }
-        // const loggedInUser = docSnap.data();
-        setUserData( docSnap.data());
-
+        const loggedInUser = docSnap.data();
+        setUserData( loggedInUser);
         // Fetch all other users
         const querySnapshot = await getDocs(collection(db, "users"));
         const usersData = [];
@@ -39,7 +38,7 @@ const UsersList = () => {
         });
 
         // Calculate compatibility for each user
-        const n = userData?.preferences?.length || 0;
+        const n = loggedInUser?.preferences?.length || 0;
         const updatedUsers = usersData.map((user) => {
           let compatibilityScore = 0;
           if (n > 1) {

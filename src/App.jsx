@@ -7,6 +7,7 @@ import { auth } from "./utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import UsersList from "./pages/UserList";
+import EditProfile from "./pages/EditProfile";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -50,6 +51,14 @@ export default function App() {
               <UsersList />
             </ProtectedRoute>
           }
+        />
+        <Route
+          path="/editProfile"
+          element={
+            <ProtectedRoute>
+              <EditProfile/>
+            </ProtectedRoute>
+          }  
         />
       </Routes>
     </Router>

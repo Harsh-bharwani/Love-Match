@@ -4,6 +4,7 @@ function calculateInversionCount(user1, user2) {
   const arr1 = user1?.orderedList || [];
   const arr2 = user2?.orderedList || [];
   console.log(arr1, arr2);
+
   
   for (let i = 0; i < arr1.length; i++) {
     for (let j = i + 1; j < arr1.length; j++) {

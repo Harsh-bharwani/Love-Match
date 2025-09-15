@@ -6,24 +6,30 @@ import { useAuth } from "../context/AuthContext";
 import calculateInversionCount from "../utils/calculateInversionCount";
 import { doc, getDoc } from "firebase/firestore";
 
+
 const UsersList = () => {
   const { currentUser } = useAuth();
   const [userData, setUserData] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const fetchUser = async () => {
-      if (currentUser) {
+    const fetchData = async () => {
+      try {
+        if (!currentUser) return;
+
+        // Fetch logged-in user
         const docRef = doc(db, "users", currentUser.uid);
         const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setUserData(docSnap.data());
+        if (!docSnap.exists()) {
+          console.error("No such document for current user!");
+          setLoading(false);
+          return;
         }
-      }
-    };
-    fetchUser();
-    const fetchUsers = async () => {
-      try {
+        const loggedInUser = docSnap.data();
+        setUserData(loggedInUser);
+
+        // Fetch all other users
         const querySnapshot = await getDocs(collection(db, "users"));
         const usersData = [];
         querySnapshot.forEach((doc) => {
@@ -32,29 +38,33 @@ const UsersList = () => {
           }
         });
 
-        // Calculate compatibility
+        // Calculate compatibility for each user
+        const n = loggedInUser?.orderedList?.length || 0;
         const updatedUsers = usersData.map((user) => {
-          const inversionCount = calculateInversionCount(
-            userData,
-            user
-          );
-          const n=userData?.orderedList?.length;
-          console.log(n);
-          
-          const compatibilityScore = ((1-(inversionCount/(n*(n-1))/2))*100).toFixed(2);
-          console.log(compatibilityScore);
+          let compatibilityScore = 0;
+          if (n > 1) {
+            const inversionCount = calculateInversionCount(
+              loggedInUser,
+              user
+            );
+            const maxInversions = (n * (n - 1)) / 2; // max possible inversions
+            compatibilityScore = (
+              (1 - inversionCount / maxInversions) *
+              100
+            ).toFixed(2);
+          }
           return { ...user, compatibilityScore };
-        });
+        }).sort((a, b)=> b.compatibilityScore-a.compatibilityScore);
 
         setUsers(updatedUsers);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching users:", error);
-      } finally {
         setLoading(false);
       }
     };
 
-    if (currentUser) fetchUsers();
+    fetchData();
   }, [currentUser]);
 
   if (loading) return <p className="text-center mt-10">Loading users...</p>;
@@ -66,15 +76,13 @@ const UsersList = () => {
         {users.map((user) => (
           <div
             key={user.uid}
-            className="p-4 border rounded-lg shadow-sm flex justify-between items-center"
+            className="p-4 border rounded-lg shadow-sm flex justify-between items-center bg-white hover:shadow-md transition"
           >
             <div>
               <h3 className="text-lg font-semibold">{user.name}</h3>
+              <p className="text-sm text-gray-600">{user.gender}</p> 
               <p className="text-sm text-gray-600">{user.age} years</p>
               <p className="text-sm">{user.bio}</p>
-              <p className="text-xs text-gray-500">
-                Interests: {user.preferences?.interests?.join(", ")}
-              </p>
             </div>
             <div className="text-right">
               <p className="font-bold text-pink-600">

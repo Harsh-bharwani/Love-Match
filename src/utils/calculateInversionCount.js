@@ -1,8 +1,8 @@
 function calculateInversionCount(user1, user2) {
   let inversionCount = 0;
 
-  const arr1 = user1?.orderedList || [];
-  const arr2 = user2?.orderedList || [];
+  const arr1 = user1?.preferences || [];
+  const arr2 = user2?.preferences || [];
   console.log(arr1, arr2);
 
   

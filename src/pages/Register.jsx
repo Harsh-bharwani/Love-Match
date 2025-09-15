@@ -1,10 +1,15 @@
+// src/pages/Register.jsx
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { auth, db } from "../utils/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { setDoc, doc } from "firebase/firestore";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { PREFERENCE_CATEGORIES } from "../utils/preferences";
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -13,14 +18,8 @@ const Register = () => {
     gender: "male",
     bio: "",
     photoURL: "",
+    preferences: PREFERENCE_CATEGORIES,
   });
-
-  const [preferenceRanks, setPreferenceRanks] = useState(
-    PREFERENCE_CATEGORIES.reduce((acc, pref) => {
-      acc[pref] = "";
-      return acc;
-    }, {})
-  );
 
   const handleChange = (e) => {
     setFormData({
@@ -29,141 +28,169 @@ const Register = () => {
     });
   };
 
-  const handlePreferenceChange = (e, pref) => {
-    setPreferenceRanks({
-      ...preferenceRanks,
-      [pref]: e.target.value,
+  const handleOnDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const items = Array.from(formData.preferences);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setFormData({
+      ...formData,
+      preferences: items,
     });
   };
 
-  const handleRegister = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      // 1. Create auth user
-      const { user } = await createUserWithEmailAndPassword(
+      // 1. Create Firebase Auth user
+      const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email,
         formData.password
       );
+      const user = userCredential.user;
 
-      // 2. Sort preferences based on rank
-      const orderedPrefs = Object.entries(preferenceRanks)
-        .sort((a, b) => Number(a[1]) - Number(b[1]))
-        .map(([pref]) => pref);
+      // 2. Update Firebase Auth profile (displayName + photoURL)
+      await updateProfile(user, {
+        displayName: formData.name,
+        photoURL: formData.photoURL,
+      });
 
-      // 3. Save in Firestore
+      // 3. Save extra details in Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         name: formData.name,
         email: formData.email,
-        age: Number(formData.age),
+        age: formData.age,
         gender: formData.gender,
         bio: formData.bio,
-        photoURL: formData.photoURL || "",
-        orderedList: orderedPrefs,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        photoURL: formData.photoURL,
+        preferences: formData.preferences,
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
 
-      alert("User registered successfully!");
-    } catch (err) {
-      console.error("Error registering:", err);
-      alert(err.message);
+      navigate("/profile");
+    } catch (error) {
+      console.error("Error registering user:", error.message);
+      alert(error.message);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center mb-4">Register</h2>
-        <form onSubmit={handleRegister} className="space-y-3">
-          {/* Basic Info */}
-          <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            className="w-full p-2 border rounded"
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            className="w-full p-2 border rounded"
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="w-full p-2 border rounded"
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="number"
-            name="age"
-            placeholder="Age"
-            className="w-full p-2 border rounded"
-            onChange={handleChange}
-            required
-          />
-          <select
-            name="gender"
-            className="w-full p-2 border rounded"
-            onChange={handleChange}
-          >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-          <textarea
-            name="bio"
-            placeholder="Your bio"
-            className="w-full p-2 border rounded"
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="photoURL"
-            placeholder="Profile Image URL"
-            className="w-full p-2 border rounded"
-            onChange={handleChange}
-          />
+    <div className="max-w-lg mx-auto mt-10 p-6 border rounded-lg shadow">
+      <h2 className="text-2xl font-bold mb-4 text-center">Create Account</h2>
 
-          {/* Preferences Ranking */}
-          <h3 className="text-lg font-semibold mt-4">Rank Your Preferences</h3>
-          <p className="text-sm text-gray-500 mb-2">
-            Assign a rank (1 = most important, 10 = least important). No
-            duplicates allowed.
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            {PREFERENCE_CATEGORIES.map((pref) => (
-              <div key={pref} className="flex flex-col">
-                <label className="text-sm">{pref}</label>
-                <input
-                  type="number"
-                  min="1"
-                  max={PREFERENCE_CATEGORIES.length}
-                  value={preferenceRanks[pref]}
-                  onChange={(e) => handlePreferenceChange(e, pref)}
-                  className="p-2 border rounded"
-                  required
-                />
-              </div>
-            ))}
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          name="name"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
 
-          <button
-            type="submit"
-            className="w-full bg-pink-500 text-white py-2 rounded hover:bg-pink-600 mt-4"
-          >
-            Register
-          </button>
-        </form>
-      </div>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <input
+          type="number"
+          name="age"
+          placeholder="Age"
+          value={formData.age}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        />
+
+        <select
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        >
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+
+        <textarea
+          name="bio"
+          placeholder="Short Bio"
+          value={formData.bio}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        />
+
+        <input
+          type="text"
+          name="photoURL"
+          placeholder="Profile Picture URL"
+          value={formData.photoURL}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        />
+
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Rank Your Preferences</h3>
+          <DragDropContext onDragEnd={handleOnDragEnd}>
+            <Droppable droppableId="preferences">
+              {(provided) => (
+                <ul
+                  className="bg-gray-50 p-4 rounded space-y-2"
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  {formData.preferences.map((pref, index) => (
+                    <Draggable key={pref} draggableId={pref} index={index}>
+                      {(provided) => (
+                        <li
+                          className="p-2 bg-white border rounded shadow cursor-pointer"
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          {pref}
+                        </li>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </ul>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-pink-600 text-white py-2 rounded hover:bg-pink-700"
+        >
+          Register
+        </button>
+      </form>
     </div>
   );
 };

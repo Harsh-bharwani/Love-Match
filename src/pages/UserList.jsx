@@ -26,8 +26,8 @@ const UsersList = () => {
           setLoading(false);
           return;
         }
-        const loggedInUser = docSnap.data();
-        setUserData(loggedInUser);
+        // const loggedInUser = docSnap.data();
+        setUserData( docSnap.data());
 
         // Fetch all other users
         const querySnapshot = await getDocs(collection(db, "users"));
@@ -39,7 +39,7 @@ const UsersList = () => {
         });
 
         // Calculate compatibility for each user
-        const n = loggedInUser?.orderedList?.length || 0;
+        const n = userData?.preferences?.length || 0;
         const updatedUsers = usersData.map((user) => {
           let compatibilityScore = 0;
           if (n > 1) {

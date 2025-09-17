@@ -10,6 +10,8 @@ import UsersList from "./pages/UserList";
 import EditProfile from "./pages/EditProfile";
 import UserProfile from "./pages/UserProfile";
 import Questions from "./pages/Questoins";
+import Register from "./pages/Register";
+
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,9 +33,7 @@ export default function App() {
         <Route
           path="/signup"
           element={
-            <ProtectedRoute>
-              <Signup />
-            </ProtectedRoute>
+              <Register />
           }
         />
         <Route

@@ -8,7 +8,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import UsersList from "./pages/UserList";
 import EditProfile from "./pages/EditProfile";
-
+import UserProfile from "./pages/UserProfile";
+import Questions from "./pages/Questoins";
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +34,7 @@ export default function App() {
         />
         <Route
           path="/login"
-          element={user ? <Navigate to="/home" replace /> : <Login />}
+          element={<Login />}
         />
         <Route
           path="/home"
@@ -56,9 +57,25 @@ export default function App() {
           path="/editProfile"
           element={
             <ProtectedRoute>
-              <EditProfile/>
+              <EditProfile />
             </ProtectedRoute>
-          }  
+          }
+        />
+        <Route
+          path="/profile/:id"
+          element={
+            <ProtectedRoute>
+              <UserProfile/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/questions"
+          element={
+            <ProtectedRoute>
+              <Questions/>
+            </ProtectedRoute>
+          } 
         />
       </Routes>
     </Router>

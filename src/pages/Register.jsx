@@ -9,16 +9,17 @@ import { PREFERENCE_CATEGORIES } from "../utils/preferences";
 
 const Register = () => {
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     age: "",
-    gender: "male",
+    gender: "-1",
     bio: "",
     photoURL: "",
-    preferences: PREFERENCE_CATEGORIES,
+    preferredGender: "-1",
+    preferredAgeGroup: "-1",
+    preferences: PREFERENCE_CATEGORIES
   });
 
   const handleChange = (e) => {
@@ -62,10 +63,7 @@ const Register = () => {
 
     } catch (error) {
       console.log(error);
-
     }
-
-
   }
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -95,11 +93,13 @@ const Register = () => {
         bio: formData.bio,
         photoURL: formData.photoURL,
         preferences: formData.preferences,
+        preferredAgeGroup: formData.preferredAgeGroup,
+        preferredGender: formData.preferredGender,
         createdAt: new Date(),
         updatedAt: new Date()
       });
 
-      navigate("/profile");
+      navigate("/questions");
     } catch (error) {
       console.error("Error registering user:", error.message);
       alert(error.message);
@@ -157,6 +157,7 @@ const Register = () => {
           onChange={handleChange}
           className="w-full border p-2 rounded"
         >
+          <option value="-1">Select Gender</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
           <option value="other">Other</option>
@@ -176,7 +177,28 @@ const Register = () => {
           onChange={fileUpload}
           className="border p-3"
         />
-
+        <select
+          name="preferredGender"
+          value={formData.preferredGender}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        >
+          <option value="-1">Select Preferred Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+        <select
+          name="preferredAgeGroup"
+          value={formData.preferredAgeGroup}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        >
+          <option value="-1">Select Preferred AgeGroup</option>
+          <option value="18-30">18-30</option>
+          <option value="31-45">31-45</option>
+          <option value="45+">45+</option>
+        </select>
         <div>
           <h3 className="text-lg font-semibold mb-2">Rank Your Preferences</h3>
           <DragDropContext onDragEnd={handleOnDragEnd}>

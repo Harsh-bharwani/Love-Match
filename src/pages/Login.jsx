@@ -22,7 +22,7 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, form.email, form.password);
       alert("Login successful 🎉");
-      navigate("/users");
+      navigate("/profile");
     } catch (err) {
       console.log(err);
       

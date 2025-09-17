@@ -5,6 +5,9 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../utils/firebase";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router";
+import { signOut } from "firebase/auth";
+import { auth } from "../utils/firebase";
+import dummyProfileImg from "../constants/dummyProfileImg";
 
 export default function Profile() {
     const { currentUser } = useAuth();
@@ -38,7 +41,7 @@ export default function Profile() {
             <div className="bg-white shadow-md rounded-xl p-8 w-full max-w-md text-center">
                 <img
                     src={userData.photoURL
-                        || "https://via.placeholder.com/150"}
+                        || dummyProfileImg}
                     alt={userData.name}
                     className="w-28 h-28 mx-auto rounded-full mb-4 object-cover border"
                 />
@@ -60,6 +63,12 @@ export default function Profile() {
                     className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 ms-3"
                 >
                     Edit Profile
+                </button>
+                <button
+                    onClick={() => signOut(auth)}
+                    className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 ms-3"
+                >
+                    LogOut
                 </button>
             </div>
         </div>

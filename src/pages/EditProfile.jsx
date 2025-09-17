@@ -10,11 +10,15 @@ const EditProfile = () => {
   const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
+    password: "",
     age: "",
-    gender: "male",
+    gender: "",
     bio: "",
     photoURL: "",
-    preferences: PREFERENCE_CATEGORIES, // default full list
+    preferredGender: "-1",
+    preferredAgeGroup: "-1",
+    preferences: PREFERENCE_CATEGORIES // default full list
   });
 
   const [loading, setLoading] = useState(false);
@@ -65,7 +69,7 @@ const EditProfile = () => {
     const file = e.target.files[0];
     if (!file) return;
     try {
-      console.log(file);
+      // console.log(file);
       const data = new FormData();
       data.append("file", file)
       data.append("upload_preset", "love_match_stock_images")
@@ -75,7 +79,7 @@ const EditProfile = () => {
         body: data
       });
       const uploadImgURL = await res.json();
-      console.log(uploadImgURL.url);
+      // console.log(uploadImgURL.url);
       setFormData({ ...formData, photoURL: uploadImgURL.url })
     } catch (error) {
       console.log(error);
@@ -130,6 +134,7 @@ const EditProfile = () => {
           onChange={handleChange}
           className="w-full border p-2 rounded"
         >
+          <option value="-1">Select Gender</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
           <option value="other">Other</option>
@@ -151,7 +156,28 @@ const EditProfile = () => {
           onChange={fileUpload}
           className="border p-3"
         />
-
+        <select
+          name="preferredGender"
+          value={formData.preferredGender}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        >
+          <option value="-1">Select Preferred Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+        <select
+          name="preferredAgeGroup"
+          value={formData.preferredAgeGroup}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        >
+          <option value="-1">Select Preferred AgeGroup</option>
+          <option value="18-30">18-30</option>
+          <option value="31-45">31-45</option>
+          <option value="45+">45+</option>
+        </select>
         {/* Preferences - Drag and Drop */}
         <div>
           <h3 className="font-semibold mb-2">Reorder Your Preferences</h3>
@@ -189,10 +215,19 @@ const EditProfile = () => {
           type="submit"
           disabled={loading}
           onClick={()=>navigate('/profile')}
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+          className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:bg-gray-400 me-3"
         >
           {loading ? "Saving..." : "Save Changes"}
         </button>
+        <button
+          type="button"
+          disabled={loading}
+          onClick={()=>navigate('/profile')}
+          className="bg-gray-500 text-white py-2 rounded hover:bg-gray-600 disabled:bg-gray-400"
+        >
+          {loading ? "Saving..." : "Cancel"}
+        </button>
+
       </form>
     </div>
   );

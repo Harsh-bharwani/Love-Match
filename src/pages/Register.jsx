@@ -41,6 +41,32 @@ const Register = () => {
     });
   };
 
+  const fileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      console.log(file);
+      const data = new FormData();
+      data.append("file", file)
+      data.append("upload_preset", "love_match_stock_images")
+      data.append("cloud_name", "dpk4fw8i2")
+      const res = await fetch("https://api.cloudinary.com/v1_1/dpk4fw8i2/image/upload", {
+        method: "POST",
+        body: data
+      });
+      const uploadImgURL = await res.json();
+      console.log("j");
+
+      console.log(uploadImgURL.url);
+      setFormData({...formData, photoURL: uploadImgURL.url })
+
+    } catch (error) {
+      console.log(error);
+
+    }
+
+
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -145,12 +171,10 @@ const Register = () => {
         />
 
         <input
-          type="text"
+          type="file"
           name="photoURL"
-          placeholder="Profile Picture URL"
-          value={formData.photoURL}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
+          onChange={fileUpload}
+          className="border p-3"
         />
 
         <div>

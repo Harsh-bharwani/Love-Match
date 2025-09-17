@@ -9,8 +9,7 @@ import { useNavigate } from "react-router";
 export default function Profile() {
     const { currentUser } = useAuth();
     const [userData, setUserData] = useState(null);
-    const navigate = useNavigate();
-
+    const navigate = useNavigate();    
     useEffect(() => {
         const fetchUser = async () => {
             if (currentUser) {
@@ -22,12 +21,17 @@ export default function Profile() {
 
             }
         };
+        
         fetchUser();
     }, [currentUser]);
 
     if (!userData) {
         return <div className="flex justify-center items-center h-screen">Loading...</div>;
     }
+
+    console.log(userData.photoURL.slice(0,userData.photoURL.indexOf('?')-4)+"preview")
+
+    
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
@@ -38,6 +42,10 @@ export default function Profile() {
                     alt={userData.name}
                     className="w-28 h-28 mx-auto rounded-full mb-4 object-cover border"
                 />
+                {/* {
+                    const imgString=
+                    userData.photoURL.indexOf('?')
+                } */}
                 <h1 className="text-2xl font-bold mb-2">{userData.name}</h1>
                 <p className="text-gray-600 mb-2">{userData.age} years</p>
                 <p className="text-gray-700">{userData.bio}</p>

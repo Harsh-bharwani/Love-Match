@@ -164,7 +164,7 @@ const Register = () => {
             onChange={handleChange}
             className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-pink-400 outline-none transition"
           >
-            <option value="-1">Select Gender</option>
+            <option value="-1">Select Your Gender</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="other">Other</option>
@@ -178,12 +178,15 @@ const Register = () => {
             className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-pink-400 outline-none transition"
           />
 
+          <label htmlFor="photoURL" className="ms-2">Upload Profile Picture</label>
           <input
             type="file"
             name="photoURL"
+            placeholder="Upload your profile picture"
             onChange={fileUpload}
             className="w-full border p-2 rounded-lg bg-white/50 cursor-pointer"
           />
+          
 
           <select
             name="preferredGender"
@@ -191,7 +194,7 @@ const Register = () => {
             onChange={handleChange}
             className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-pink-400 outline-none transition"
           >
-            <option value="-1">Select Preferred Gender</option>
+            <option value="-1">Looking to match with?</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="other">Other</option>

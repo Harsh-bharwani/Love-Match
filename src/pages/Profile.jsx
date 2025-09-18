@@ -12,7 +12,8 @@ export default function Profile() {
   const { currentUser } = useAuth();
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
-
+  console.log(userData);
+  
   useEffect(() => {
     const fetchUser = async () => {
       if (currentUser) {

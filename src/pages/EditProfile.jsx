@@ -178,6 +178,33 @@ const EditProfile = () => {
               className="w-full border p-3 rounded-xl bg-pink-50 cursor-pointer"
             />
           </div>
+          {/* Preferred Gender */}
+          <motion.select
+            whileFocus={{ scale: 1.02 }}
+            name="preferredGender"
+            value={formData.preferredGender}
+            onChange={handleChange}
+            className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-pink-400 outline-none"
+          >
+            <option value="-1">Select Preferred Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </motion.select>
+
+          {/* Preferred AgeGroup */}
+          <motion.select
+            whileFocus={{ scale: 1.02 }}
+            name="preferredAgeGroup"
+            value={formData.preferredAgeGroup}
+            onChange={handleChange}
+            className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-pink-400 outline-none"
+          >
+            <option value="-1">Select Preferred AgeGroup</option>
+            <option value="male">18-30</option>
+            <option value="female">31-45</option>
+            <option value="other">45+</option>
+          </motion.select>
 
           {/* Preferences */}
           <div>
